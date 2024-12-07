@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SocketModule } from './socket/socket.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserModule } from './user/user.module';
+
+@Module({
+  imports: [SocketModule, MongooseModule.forRoot('mongodb://root:root@localhost:27017', {
+    dbName: 'web_chat', // Nome do banco de dados
+  }), UserModule,],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule { }

@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: webChat_container
+    ports:
+      - "27017:27017" # Porta do MongoDB
+    volumes:
+      - mongo-data:/data/db # Persistência dos dados
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root # Usuário administrador
+      MONGO_INITDB_ROOT_PASSWORD: root # Senha do administrador
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo_express_container
+    ports:
+      - "8081:8081" # Interface web para gerenciar o MongoDB
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root # Usuário do MongoDB
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root # Senha do MongoDB
+      ME_CONFIG_MONGODB_SERVER: mongodb # Nome do serviço do MongoDB no Compose
+    depends_on:
+      - mongodb # Garante que o MongoDB suba antes deste serviço
+
+volumes:
+  mongo-data: # Volume para os dados do MongoDB
