@@ -10,7 +10,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UserService,
-  ) {}
+  ) { }
 
   @Post('register')
   async register(@Body() data: UserDto) {
@@ -26,7 +26,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    const userData = await this.usersService.getById(req.user.userId);
+    return { id: userData._id, nickname: userData.nickname, email: userData.email };
   }
 }
