@@ -22,19 +22,20 @@ export class SocketGateway
   server: Server;
   private logger: Logger = new Logger('WebSocketGateway');
   constructor(private readonly socketService: SocketService) { }
+  private users = [];
 
   afterInit(server: Server) {
     this.logger.log('WebSocket initialized');
   }
 
   handleConnection(client: Socket) {
-    client.emit('users', [{ name: 'erick' }]);
     this.socketService.handleConnection(client);
-
     this.logger.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
+    this.users = this.users.filter((user) => user.id != client.id)
+    client.emit('users', this.users);
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
@@ -104,5 +105,11 @@ export class SocketGateway
         user: null,
       });
     }
+  }
+
+  @SubscribeMessage('activeUser')
+  handleActiveUserConnect(client:Socket, data:{id:string, nickname:string}){
+    this.users.push(data);
+    client.emit('users',this.users);
   }
 }
