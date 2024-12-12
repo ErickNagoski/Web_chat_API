@@ -17,12 +17,11 @@ import { SocketService } from './socket.service';
   },
 })
 export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('WebSocketGateway');
-  constructor(private readonly socketService: SocketService) {}
+  constructor(private readonly socketService: SocketService) { }
 
   afterInit(server: Server) {
     this.logger.log('WebSocket initialized');
@@ -30,7 +29,6 @@ export class SocketGateway
 
   handleConnection(client: Socket) {
     client.emit('users', [{ name: 'erick' }]);
-    client.emit('message', { content: 'usuário', user: 'aaaaaa' });
     this.socketService.handleConnection(client);
 
     this.logger.log(`Client connected: ${client.id}`);
@@ -60,6 +58,7 @@ export class SocketGateway
         content: data.message,
         chat: data.chat,
         user: data.sender,
+        date: new Date().toISOString()
       };
       this.server.to(data.to).emit('message', payload);
     } else {
@@ -67,13 +66,14 @@ export class SocketGateway
         content: data.message,
         chat: data.sender,
         user: data.sender,
+        date: new Date().toISOString()
       };
       this.server.emit('message', payload);
     }
 
-    this.server
-      .to(data.to)
-      .emit('message', { content: data.message, user: data.sender }); // Reenvia a mensagem para todos os clientes
+    // this.server
+    //   .to(data.to)
+    //   .emit('message', { content: data.message, user: data.sender }); // Reenvia a mensagem para todos os clientes
     return `Message received: ${data}`;
   }
 
@@ -81,13 +81,14 @@ export class SocketGateway
   handleJoinRoom(client: Socket, data: { nickname: string; room: string }) {
     // this.socketService.addClientToRoom(client, room);
     client.join(data.room);
-    if (data.room != 'general') {
-      client.leave('general');
+    if (data.room != 'geral') {
+      client.leave('geral');
     }
-    if (data.room != 'general') {
+    if (data.room != 'geral') {
       this.server.to(data.room).emit('message', {
         content: `${data.nickname} entrou na sala ${data.room}`,
-        user: ' ',
+        user: null,
+        date: new Date().toISOString()
       });
     }
   }
@@ -96,8 +97,8 @@ export class SocketGateway
   handleLeaveRoom(client: Socket, room: string) {
     // this.socketService.removeClientFromRoom(client, room);
     client.leave(room);
-    client.join('general');
-    if (room != 'general') {
+    client.join('geral');
+    if (room != 'geral') {
       this.server.to(room).emit('message', {
         content: `${client.id} left the room ${room}`,
         user: null,
