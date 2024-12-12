@@ -9,10 +9,17 @@ import { MessagesModule } from './messages/messages.module';
 import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
-  imports: [SocketModule, MongooseModule.forRoot('mongodb://root:root@localhost:27017', {
-    dbName: 'web_chat', // Nome do banco de dados
-  }), UserModule, AuthModule, MessagesModule, RoomsModule,],
+  imports: [
+    SocketModule,
+    MongooseModule.forRoot('mongodb://root:root@localhost:27017', {
+      dbName: 'web_chat', // Nome do banco de dados
+    }),
+    UserModule,
+    AuthModule,
+    MessagesModule,
+    RoomsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

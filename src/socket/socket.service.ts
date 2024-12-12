@@ -9,23 +9,6 @@ export class SocketService {
     const clientId = socket.id;
     this.connectedClients.set(clientId, socket);
     socket.emit('users', this.connectedClients);
-
-    // console.log(`Client connected: ${clientId}`);
-
-    // socket.on('message', (data: { to: string; message: string }) => {
-    //   console.log(`Received message from ${clientId}:`, data);
-    //   this.sendMessageToClient(data.to, data.message);
-    // });
-
-    // socket.on('broadcast', (message: string) => {
-    //   console.log(`Broadcasting message from ${clientId}:`, message);
-    //   this.broadcastMessage(message);
-    // });
-
-    // socket.on('disconnect', () => {
-    //   console.log(`Client disconnected: ${clientId}`);
-    //   this.connectedClients.delete(clientId);
-    // });
   }
 
   sendMessageToClient(clientId: string, message: string): void {

@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create-message.dto';
+import { MessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('messages')
@@ -8,13 +17,21 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
+  create(@Body() createMessageDto: MessageDto) {
     return this.messagesService.create(createMessageDto);
   }
 
   @Get()
   findAll() {
     return this.messagesService.findAll();
+  }
+
+  @Get('/history/:room')
+  findHistory(
+    @Param('room') room: string,
+    @Query() query: { page: number; limit: number },
+  ) {
+    return this.messagesService.getHistory(room, query.limit, query.page);
   }
 
   @Get(':id')
