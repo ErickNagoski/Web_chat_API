@@ -18,15 +18,14 @@ import { MessagesService } from 'src/messages/messages.service';
   },
 })
 export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('WebSocketGateway');
   constructor(
     private readonly socketService: SocketService,
     private readonly messagesService: MessagesService,
-  ) {}
+  ) { }
   private users = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -99,13 +98,15 @@ export class SocketGateway
   }
 
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, room: string) {
+  handleLeaveRoom(client: Socket, data: { nickname: string; room: string }) {
+    const {room, nickname} = data;
     client.leave(room);
     client.join('geral');
     if (room != 'geral') {
       this.server.to(room).emit('message', {
-        content: `${client.id} left the room ${room}`,
+        content: `${data.nickname} saiu da sala.`,
         user: null,
+        date: new Date().toISOString(),
       });
     }
   }
