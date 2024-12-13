@@ -18,14 +18,15 @@ import { MessagesService } from 'src/messages/messages.service';
   },
 })
 export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('WebSocketGateway');
   constructor(
     private readonly socketService: SocketService,
     private readonly messagesService: MessagesService,
-  ) { }
+  ) {}
   private users = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,7 +45,7 @@ export class SocketGateway
   }
 
   @SubscribeMessage('message')
-  handleMessage(
+  async handleMessage(
     @MessageBody()
     data: {
       to: string;
@@ -54,8 +55,8 @@ export class SocketGateway
       isChannel: boolean;
       userId: string;
     },
-  ): void {
-    this.messagesService.create({
+  ): Promise<void> {
+    const { id: messageId } = await this.messagesService.create({
       room: data.to,
       nickName: data.sender,
       content: data.message,
@@ -65,6 +66,7 @@ export class SocketGateway
 
     if (data.isChannel) {
       const payload = {
+        id: messageId,
         content: data.message,
         chat: data.chat,
         user: data.sender,
@@ -73,6 +75,7 @@ export class SocketGateway
       this.server.to(data.to).emit('message', payload);
     } else {
       const payload = {
+        id: messageId,
         content: data.message,
         chat: data.sender,
         user: data.sender,
@@ -99,12 +102,12 @@ export class SocketGateway
 
   @SubscribeMessage('leaveRoom')
   handleLeaveRoom(client: Socket, data: { nickname: string; room: string }) {
-    const {room, nickname} = data;
+    const { room, nickname } = data;
     client.leave(room);
     client.join('geral');
     if (room != 'geral') {
       this.server.to(room).emit('message', {
-        content: `${data.nickname} saiu da sala.`,
+        content: `${nickname} saiu da sala.`,
         user: null,
         date: new Date().toISOString(),
       });
@@ -118,5 +121,10 @@ export class SocketGateway
   ) {
     this.users.push(data);
     this.server.emit('users', this.users);
+  }
+
+  @SubscribeMessage('newServer')
+  newServerCreated() {
+    this.server.emit('newServer', this.users);
   }
 }

@@ -6,14 +6,16 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class RoomsService {
-  constructor(@InjectModel('Rooms') private readonly roomsModel: Model<RoomDto>) { }
+  constructor(
+    @InjectModel('Rooms') private readonly roomsModel: Model<RoomDto>,
+  ) {}
 
   async create(createRoomDto: RoomDto) {
     try {
       const newRoom = new this.roomsModel(createRoomDto);
       return await newRoom.save();
     } catch (error) {
-      throw new Error(`Error creating room: ${error.message}`);
+      throw new Error(`Erro para criar sala: ${error.message}`);
     }
   }
 
@@ -21,7 +23,7 @@ export class RoomsService {
     try {
       return await this.roomsModel.find().exec();
     } catch (error) {
-      throw new Error(`Error finding rooms: ${error.message}`);
+      throw new Error(`Erro: ${error.message}`);
     }
   }
 
@@ -29,26 +31,28 @@ export class RoomsService {
     try {
       const room = await this.roomsModel.findById(id).exec();
       if (!room) {
-        throw new Error(`Room with id ${id} not found`);
+        throw new Error(`Sala não encontrada`);
       }
       return room;
     } catch (error) {
-      throw new Error(`Error finding room with id ${id}: ${error.message}`);
+      throw new Error(`Sala não encontrada: ${error.message}`);
     }
   }
 
   async update(id: string, updateRoomDto: UpdateRoomDto) {
     try {
-      const updatedRoom = await this.roomsModel.findByIdAndUpdate(id, updateRoomDto, {
-        new: true,
-        runValidators: true,
-      }).exec();
+      const updatedRoom = await this.roomsModel
+        .findByIdAndUpdate(id, updateRoomDto, {
+          new: true,
+          runValidators: true,
+        })
+        .exec();
       if (!updatedRoom) {
-        throw new Error(`Room with id ${id} not found`);
+        throw new Error(`Sala não encontrada`);
       }
       return updatedRoom;
     } catch (error) {
-      throw new Error(`Error updating room with id ${id}: ${error.message}`);
+      throw new Error(`Erro ao atualizar: ${error.message}`);
     }
   }
 
@@ -56,11 +60,11 @@ export class RoomsService {
     try {
       const deletedRoom = await this.roomsModel.findByIdAndDelete(id).exec();
       if (!deletedRoom) {
-        throw new Error(`Room with id ${id} not found`);
+        throw new Error(`Sala não encontrada`);
       }
-      return { message: `Room with id ${id} removed successfully` };
+      return { message: `Sala deletada` };
     } catch (error) {
-      throw new Error(`Error removing room with id ${id}: ${error.message}`);
+      throw new Error(`Erro ao deletar: ${error.message}`);
     }
   }
 }

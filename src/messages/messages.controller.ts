@@ -21,11 +21,6 @@ export class MessagesController {
     return this.messagesService.create(createMessageDto);
   }
 
-  @Get()
-  findAll() {
-    return this.messagesService.findAll();
-  }
-
   @Get('/history/:room')
   findHistory(
     @Param('room') room: string,
@@ -34,18 +29,13 @@ export class MessagesController {
     return this.messagesService.getHistory(room, query.limit, query.page);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(+id);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(+id, updateMessageDto);
+    return this.messagesService.update(id, updateMessageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.messagesService.remove(+id);
+    return this.messagesService.remove(id);
   }
 }

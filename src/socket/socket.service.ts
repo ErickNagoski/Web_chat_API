@@ -15,16 +15,14 @@ export class SocketService {
     const clientSocket = this.connectedClients.get(clientId);
     if (clientSocket) {
       clientSocket.emit('message', message);
-      console.log(`Sent message to client ${clientId}:`, message);
     } else {
-      console.error(`Client ${clientId} not found`);
+      console.error(`Cliente ${clientId} não encontrado`);
     }
   }
 
   broadcastMessage(message: string): void {
-    this.connectedClients.forEach((clientSocket, clientId) => {
+    this.connectedClients.forEach((clientSocket) => {
       clientSocket.emit('broadcast', message);
-      console.log(`Broadcasted message to client ${clientId}:`, message);
     });
   }
 

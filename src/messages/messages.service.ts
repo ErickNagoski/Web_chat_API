@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,30 +11,37 @@ export class MessagesService {
   ) {}
 
   async create(createMessageDto: MessageDto) {
-    console.log('Creating message:', createMessageDto);
     try {
-      const newRoom = new this.messagesModel(createMessageDto);
-      return await newRoom.save();
+      const newMessage = new this.messagesModel(createMessageDto);
+      const savedMessage = await newMessage.save();
+      return { id: savedMessage._id };
     } catch (error) {
       throw new Error(`Error creating room: ${error.message}`);
     }
   }
 
-  findAll() {
-    return `This action returns all messages`;
+  async update(id: string, updateMessageDto: UpdateMessageDto) {
+    const updatedMessage = await this.messagesModel
+      .findByIdAndUpdate(id, updateMessageDto, { new: true })
+      .exec();
+
+    if (!updatedMessage) {
+      throw new NotFoundException(`Mensagem não foi encontrada`);
+    }
+
+    return updatedMessage;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
+  async remove(id: string) {
+    const deletedMessage = await this.messagesModel
+      .findByIdAndDelete(id)
+      .exec();
 
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    console.log(updateMessageDto);
-    return `This action updates a #${id} message`;
-  }
+    if (!deletedMessage) {
+      throw new NotFoundException(`Mensagem não foi encontrada`);
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} message`;
+    return { message: `Mensagem deletada` };
   }
 
   async getHistory(
