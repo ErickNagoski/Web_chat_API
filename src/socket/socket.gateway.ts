@@ -40,7 +40,7 @@ export class SocketGateway
 
   handleDisconnect(client: Socket) {
     this.users = this.users.filter((user) => user.id != client.id);
-    client.emit('users', this.users);
+    this.server.emit('users', this.users);
     this.logger.log(`Usuário desconectado: ${client.id}`);
   }
 
@@ -116,6 +116,6 @@ export class SocketGateway
     data: { id: string; nickname: string },
   ) {
     this.users.push(data);
-    client.emit('users', this.users);
+    this.server.emit('users', this.users);
   }
 }
