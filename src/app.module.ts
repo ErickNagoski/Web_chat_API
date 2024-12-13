@@ -11,8 +11,8 @@ import { RoomsModule } from './rooms/rooms.module';
 @Module({
   imports: [
     SocketModule,
-    MongooseModule.forRoot('mongodb://root:root@localhost:27017', {
-      dbName: 'web_chat', // Nome do banco de dados
+    MongooseModule.forRoot('mongodb://root:root@mongodb:27017', {
+      dbName: 'web_chat',
     }),
     UserModule,
     AuthModule,
